@@ -169,7 +169,11 @@ int main(int argc, char **argv)
         loadPalette("palettes/webfoot.pal");
         fetchImages(picturesVga, buffer, 318, 198, 1);
         loadPalette("palettes/primary.pal");
-        fetchImages(picturesVga, buffer, 318, 198, 6);
+        fetchImages(picturesVga, buffer, 318, 198, 3);
+        PAL[255][1] = 0xFF;
+        fetchImages(picturesVga, buffer, 318, 198, 1);
+        PAL[255][1] = 0x00;
+        fetchImages(picturesVga, buffer, 318, 198, 2);
         // scene objects and walls
         fetchImages(picturesVga, buffer, 210, 105, 73);
         loadPalette("palettes/y2_intro.pal");
@@ -187,7 +191,10 @@ int main(int argc, char **argv)
         // floors and ceilings
         fetchImages(picturesVga, buffer, 224, 74, 18);
         // lower floors and ceilings
-        fetchImages(picturesVga, buffer, 224, 62, 12);
+        PAL[255][1] = 0xFF;
+        fetchImages(picturesVga, buffer, 224, 62, 2);
+        PAL[255][1] = 0x00;
+        fetchImages(picturesVga, buffer, 224, 62, 10);
         // paper dolls and paper doll effects
         fetchImages(picturesVga, buffer, 56, 136, 23);
         loadPalette("palettes/y2_intro.pal");
