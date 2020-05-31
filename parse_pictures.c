@@ -95,7 +95,7 @@ void fetchImages(FILE *picturesVga, unsigned char *buffer, int w, int h, int c)
 int main(int argc, char **argv)
 {
     unsigned char buffer[318 * 198];
-    unsigned char pictures_vga[32] = { "PICTURES.VGA" };
+    char pictures_vga[32] = { "PICTURES.VGA" };
     
     for (int i = 1; i < argc; ++i)
     {        
@@ -120,14 +120,15 @@ int main(int argc, char **argv)
         {
             yendor_version = 2;
         }
-        
+
         if (!strcmp(argv[i], "-y3"))
         {
             yendor_version = 3;
         }
-        
+
         if (!strcmp(argv[i], "-?"))
         {
+            printf("Usage: %s <optional parameters>\n", argv[0]);
             printf("-a   - export images to RGBA PNGs (default: RGB with magenta set for color-key)\n");
             printf("-s X - export images scaled by an integer factor of X (default: unscaled)\n");
             printf("-f X - specify name of the PICTURES.VGA file (default: PICTURES.VGA)\n");
@@ -136,7 +137,6 @@ int main(int argc, char **argv)
             return 0;
         }
     }
-
 
     FILE *picturesVga = fopen(pictures_vga, "rb");
     if (!picturesVga)
