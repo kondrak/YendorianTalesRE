@@ -1,5 +1,6 @@
 #if 0
-mkdir pictures_vga
+mkdir pictures_y2
+mkdir pictures_y3
 gcc parse_pictures.c -O3 -std=c11 -o parse_pictures && ./parse_pictures $@
 exit
 #endif
@@ -19,6 +20,7 @@ int picOffset = 0;
 int picCount = 0;
 int scale = 1;
 int alpha = 0;
+int yendor_version = 3;
 
 void loadPalette(const char *palName)
 {
@@ -51,7 +53,7 @@ void saveImage(int w, int h, int channels, unsigned char *buffer)
     }
 
     memset(filename, 0, sizeof(filename));
-    sprintf(filename, "pictures_vga/%04d.png", picCount);
+    sprintf(filename, "pictures_y%d/%04d.png", yendor_version, picCount);
     printf("Extracting: %s\n", filename);
 
     if (scale > 1)
@@ -94,8 +96,6 @@ int main(int argc, char **argv)
 {
     unsigned char buffer[318 * 198];
     unsigned char pictures_vga[32] = { "PICTURES.VGA" };
-    int yendor2 = 0;
-    int yendor3 = 1;
     
     for (int i = 1; i < argc; ++i)
     {        
@@ -118,14 +118,12 @@ int main(int argc, char **argv)
 
         if (!strcmp(argv[i], "-y2"))
         {
-            yendor2 = 1;
-            yendor3 = 0;
+            yendor_version = 2;
         }
         
         if (!strcmp(argv[i], "-y3"))
         {
-            yendor2 = 0;
-            yendor3 = 1;
+            yendor_version = 3;
         }
         
         if (!strcmp(argv[i], "-?"))
@@ -147,7 +145,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (yendor2)
+    if (yendor_version == 2)
     {
         printf("Using Yendorian Tales 2 PICTURES.VGA format.\n");
 
@@ -209,7 +207,7 @@ int main(int argc, char **argv)
         fetchImages(picturesVga, buffer, 8, 8, 116);
     }
 
-    if (yendor3)
+    if (yendor_version == 3)
     {
         printf("Using Yendorian Tales 3 PICTURES.VGA format.\n");
 
