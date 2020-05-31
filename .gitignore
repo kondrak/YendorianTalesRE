@@ -1,0 +1,10 @@
+.DS_Store
+*~
+*#
+*.vga
+*.dat
+*.exe
+pictures_y2
+pictures_y3
+parse_pictures
+
