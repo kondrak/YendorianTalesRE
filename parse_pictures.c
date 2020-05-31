@@ -157,7 +157,9 @@ int main(int argc, char **argv)
         loadPalette("palettes/y2_intro.pal");
         fetchImages(picturesVga, buffer, 318, 198, 2);
         loadPalette("palettes/primary.pal");
-        fetchImages(picturesVga, buffer, 318, 198, 5);
+        fetchImages(picturesVga, buffer, 318, 198, 4);
+        loadPalette("palettes/y2_thaine.pal");
+        fetchImages(picturesVga, buffer, 318, 198, 1);
         loadPalette("palettes/y2_cluebook.pal");
         fetchImages(picturesVga, buffer, 318, 198, 1);
         loadPalette("palettes/primary.pal");
