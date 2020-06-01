@@ -6,6 +6,8 @@ exit
 #endif
 
 #include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 int yendor_version = 3;
@@ -45,7 +47,7 @@ void fetchVoc(FILE *registerExe, FILE *worldDat)
         
         char filename[32];
         memset(filename, 0, sizeof(filename));
-        sprintf(filename, "voc_y%d/%d.voc", yendor_version, i);
+        sprintf(filename, "voc_y%d/%03d.voc", yendor_version, i);
         FILE *vocFile = fopen(filename, "wb");
         fseek(worldDat, vocOffset, 0);
         uint8_t *vocData = (uint8_t *)malloc(vocSize * sizeof(uint8_t));
