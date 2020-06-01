@@ -1,6 +1,8 @@
 #if 0
 mkdir voc_y2
 mkdir voc_y3
+mkdir cmf_y2
+mkdir cmf_y3
 gcc parse_sfx.c -O3 -std=c11 -o parse_sfx && ./parse_sfx $@
 exit
 #endif
@@ -12,12 +14,13 @@ exit
 
 int yendor_version = 3;
 int32_t sfxOffset = 0x0002D057;
-int sfxCount = -1;
+int32_t cmfOffset = 0x0002CFC7;
 
 void fetchVoc(FILE *registerExe, FILE *worldDat)
 {
     int32_t vocOffset = 0x00FFFFFF;
     uint16_t vocSize = 0;
+    int sfxCount = -1;
 
     fseek(registerExe, sfxOffset, 0);
     
@@ -55,6 +58,51 @@ void fetchVoc(FILE *registerExe, FILE *worldDat)
         fwrite(vocData, sizeof(uint8_t), vocSize, vocFile);
         fclose(vocFile);
         free(vocData);
+    }
+}
+
+void fetchCmf(FILE *registerExe, FILE *worldDat)
+{
+    int32_t musOffset = 0x00FFFFFF;
+    uint16_t cmfSize = 0;
+    int cmfCount = -1;
+
+    fseek(registerExe, cmfOffset, 0);
+    
+    // count music first
+    do {
+        int bytesRead = fread(&musOffset, sizeof(int32_t), 1, registerExe);
+        
+        if (feof(registerExe))
+        {
+            printf("Reached EOF.\n");
+            break;
+        }
+
+        cmfCount++;
+    } while ((musOffset & 0xFF000000) == 0);
+
+    printf("Found %d music files.\n", cmfCount); 
+
+    for(int i = 0; i < cmfCount; ++i)
+    {
+        fseek(registerExe, cmfOffset + i * sizeof(int32_t), 0);
+        fread(&musOffset, sizeof(int32_t), 1, registerExe);
+        fseek(registerExe, cmfOffset + cmfCount * sizeof(int32_t) + i * sizeof(uint16_t), 0);
+        fread(&cmfSize, sizeof(uint16_t), 1, registerExe);
+        
+        printf("%X %X\n", musOffset, cmfSize);
+        
+        char filename[32];
+        memset(filename, 0, sizeof(filename));
+        sprintf(filename, "cmf_y%d/%03d.cmf", yendor_version, i);
+        FILE *cmfFile = fopen(filename, "wb");
+        fseek(worldDat, musOffset, 0);
+        uint8_t *cmfData = (uint8_t *)malloc(cmfSize * sizeof(uint8_t));
+        fread(cmfData, sizeof(uint8_t), cmfSize, worldDat);
+        fwrite(cmfData, sizeof(uint8_t), cmfSize, cmfFile);
+        fclose(cmfFile);
+        free(cmfData);
     }
 }
 
@@ -115,7 +163,8 @@ int main(int argc, char **argv)
     if (yendor_version == 3)
     {
         printf("Using Yendorian Tales 3 format.\n");
-        fetchVoc(registerExe, worldDat);
+        //fetchVoc(registerExe, worldDat);
+        fetchCmf(registerExe, worldDat);
     }
 
     fclose(registerExe);
