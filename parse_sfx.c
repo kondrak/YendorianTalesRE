@@ -137,8 +137,8 @@ int main(int argc, char **argv)
         {
             printf("Usage: %s <optional parameters>\n", argv[0]);
             printf("-f X - specify name of the WORLD.DAT file (default: WORLD.DAT)\n");
-            printf("-y2  - extract Yendorian Tales 2 data\n");
-            printf("-y3  - extract Yendorian Tales 3 data (default)\n");
+            printf("-y2  - extract Yendorian Tales 2 data - requires SWREG.EXE file to be present\n");
+            printf("-y3  - extract Yendorian Tales 3 data (default) - requires REGISTER.EXE file to be present\n");
             return 0;
         }
     }
