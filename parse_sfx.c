@@ -13,20 +13,20 @@ exit
 #include <string.h>
 
 int yendor_version = 3;
-int32_t sfxOffset = 0x0002D057;
-int32_t cmfOffset = 0x0002CFC7;
 
-void fetchVoc(FILE *registerExe, FILE *worldDat)
+void fetchVoc(FILE *registerExe, FILE *worldDat, int32_t startOffset)
 {
     int32_t vocOffset = 0x00FFFFFF;
     uint16_t vocSize = 0;
-    int sfxCount = -1;
+    int vocCount = -1;
+    char filename[32];
 
-    fseek(registerExe, sfxOffset, 0);
+    fseek(registerExe, startOffset, 0);
     
     // count sounds first
-    do {
-        int bytesRead = fread(&vocOffset, sizeof(int32_t), 1, registerExe);
+    do
+    {
+        fread(&vocOffset, sizeof(int32_t), 1, registerExe);
         
         if (feof(registerExe))
         {
@@ -34,44 +34,47 @@ void fetchVoc(FILE *registerExe, FILE *worldDat)
             break;
         }
 
-        sfxCount++;
+        vocCount++;
     } while ((vocOffset & 0xFF000000) == 0);
 
-    printf("Found %d sounds\n", sfxCount); 
-
-    for(int i = 0; i < sfxCount; ++i)
+    for (int i = 0; i < vocCount; ++i)
     {
-        fseek(registerExe, sfxOffset + i * sizeof(int32_t), 0);
+        fseek(registerExe, startOffset + i * sizeof(int32_t), 0);
         fread(&vocOffset, sizeof(int32_t), 1, registerExe);
-        fseek(registerExe, sfxOffset + sfxCount * sizeof(int32_t) + i * sizeof(uint16_t), 0);
+        fseek(registerExe, startOffset + vocCount * sizeof(int32_t) + i * sizeof(uint16_t), 0);
         fread(&vocSize, sizeof(uint16_t), 1, registerExe);
-        
-        printf("%X %X\n", vocOffset, vocSize);
-        
-        char filename[32];
+
         memset(filename, 0, sizeof(filename));
         sprintf(filename, "voc_y%d/%03d.voc", yendor_version, i);
-        FILE *vocFile = fopen(filename, "wb");
+
         fseek(worldDat, vocOffset, 0);
-        uint8_t *vocData = (uint8_t *)malloc(vocSize * sizeof(uint8_t));
+        uint8_t *vocData = (uint8_t *)malloc(vocSize * sizeof(uint8_t));    
         fread(vocData, sizeof(uint8_t), vocSize, worldDat);
-        fwrite(vocData, sizeof(uint8_t), vocSize, vocFile);
-        fclose(vocFile);
+
+        if ((vocData[3] | (vocData[2] << 8) | (vocData[1] << 16) | (vocData[0] << 24)) == 0x43726561)
+        {
+            printf("Extracting: %s\n", filename);
+            FILE *vocFile = fopen(filename, "wb");
+            fwrite(vocData, sizeof(uint8_t), vocSize, vocFile);
+            fclose(vocFile);
+        }
         free(vocData);
     }
 }
 
-void fetchCmf(FILE *registerExe, FILE *worldDat)
+void fetchCmf(FILE *registerExe, FILE *worldDat, int32_t startOffset)
 {
-    int32_t musOffset = 0x00FFFFFF;
+    int32_t cmfOffset = 0x00FFFFFF;
     uint16_t cmfSize = 0;
     int cmfCount = -1;
+    char filename[32];
 
-    fseek(registerExe, cmfOffset, 0);
+    fseek(registerExe, startOffset, 0);
     
     // count music first
-    do {
-        int bytesRead = fread(&musOffset, sizeof(int32_t), 1, registerExe);
+    do
+    {
+        fread(&cmfOffset, sizeof(int32_t), 1, registerExe);
         
         if (feof(registerExe))
         {
@@ -80,24 +83,20 @@ void fetchCmf(FILE *registerExe, FILE *worldDat)
         }
 
         cmfCount++;
-    } while ((musOffset & 0xFF000000) == 0);
-
-    printf("Found %d music files.\n", cmfCount); 
+    } while ((cmfOffset & 0xFF000000) == 0);
 
     for(int i = 0; i < cmfCount; ++i)
     {
-        fseek(registerExe, cmfOffset + i * sizeof(int32_t), 0);
-        fread(&musOffset, sizeof(int32_t), 1, registerExe);
-        fseek(registerExe, cmfOffset + cmfCount * sizeof(int32_t) + i * sizeof(uint16_t), 0);
+        fseek(registerExe, startOffset + i * sizeof(int32_t), 0);
+        fread(&cmfOffset, sizeof(int32_t), 1, registerExe);
+        fseek(registerExe, startOffset + cmfCount * sizeof(int32_t) + i * sizeof(uint16_t), 0);
         fread(&cmfSize, sizeof(uint16_t), 1, registerExe);
-        
-        printf("%X %X\n", musOffset, cmfSize);
-        
-        char filename[32];
+
         memset(filename, 0, sizeof(filename));
         sprintf(filename, "cmf_y%d/%03d.cmf", yendor_version, i);
+        printf("Extracting: %s\n", filename);
         FILE *cmfFile = fopen(filename, "wb");
-        fseek(worldDat, musOffset, 0);
+        fseek(worldDat, cmfOffset, 0);
         uint8_t *cmfData = (uint8_t *)malloc(cmfSize * sizeof(uint8_t));
         fread(cmfData, sizeof(uint8_t), cmfSize, worldDat);
         fwrite(cmfData, sizeof(uint8_t), cmfSize, cmfFile);
@@ -116,25 +115,30 @@ int main(int argc, char **argv)
     {        
         if (!strcmp(argv[i], "-f") && i < argc - 1)
         {
-            memset(register_exe, 0, sizeof(register_exe));
-            strncpy(register_exe, argv[i+1], sizeof(register_exe));
+            memset(world_dat, 0, sizeof(world_dat));
+            strncpy(world_dat, argv[i+1], sizeof(world_dat));
         }
 
         if (!strcmp(argv[i], "-y2"))
         {
             yendor_version = 2;
+            memset(register_exe, 0, sizeof(register_exe));
+            strncpy(register_exe, "SWREG.EXE", sizeof(register_exe));
         }
         
         if (!strcmp(argv[i], "-y3"))
         {
             yendor_version = 3;
+            memset(register_exe, 0, sizeof(register_exe));
+            strncpy(register_exe, "REGISTER.EXE", sizeof(register_exe));
         }
         
         if (!strcmp(argv[i], "-?"))
         {
             printf("Usage: %s <optional parameters>\n", argv[0]);
-            printf("-y2  - use Yendorian Tales 2 format\n");
-            printf("-y3  - use Yendorian Tales 3 format (default)\n");
+            printf("-f X - specify name of the WORLD.DAT file (default: WORLD.DAT)\n");
+            printf("-y2  - extract Yendorian Tales 2 data\n");
+            printf("-y3  - extract Yendorian Tales 3 data (default)\n");
             return 0;
         }
     }
@@ -157,14 +161,16 @@ int main(int argc, char **argv)
 
     if (yendor_version == 2)
     {
-        printf("Using Yendorian Tales 2 format.\n");
+        printf("Extracting Yendorian Tales 2 data.\n");
+        fetchVoc(registerExe, worldDat, 0x0002EBF1);
+        fetchCmf(registerExe, worldDat, 0x0002EB73);
     }
 
     if (yendor_version == 3)
     {
-        printf("Using Yendorian Tales 3 format.\n");
-        //fetchVoc(registerExe, worldDat);
-        fetchCmf(registerExe, worldDat);
+        printf("Extracting Yendorian Tales 3 data.\n");
+        fetchVoc(registerExe, worldDat, 0x0002D057);
+        fetchCmf(registerExe, worldDat, 0x0002CFC7);
     }
 
     fclose(registerExe);
