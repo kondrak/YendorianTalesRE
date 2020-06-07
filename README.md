@@ -6,7 +6,18 @@ Done using HxD editor and DosBox with debugger feature enabled to track all asse
 ## Graphics
 Both games store image date in a dedicated, uncompressed `PICTURES.VGA` file which is a concatenated stream of bytes - each one representing a single pixel referencing a color index in proper DOS palette. There's no size nor color information stored in this file, all data is fetched directly from the game's .EXE file. Graphics are grouped by size ranging from the largest (fullscreen images) to smallest (8x8 pixel icons used throughout the game). Pallete data was extracted using DosBox's screen capture feature and saved as `.pal` files. `PICTURES.VGA` is kept open during runtime and required images are fetched as memory offsets by the game when necessary. Most animation effects (enhanced weapons, texture shimmering) is done using good old palette cycling and different enemy variantions are also achieved by using different colors - extraction program only uses the primary palette for simplicity.
 Game runs in mode 13h at all times, one exception being the Pacific splash screen which is 640x480 and stored in the .EXE as a PCX file. For some reason both games fetch this data and save it on the disk, only to remove it after exiting the game.
- 
+
+Final color in the pallete is used for transparency colorkeying - the extracted palette modifies that value to magenta for better distinction. Sample extraction program can also export palette colors to RGBA format with the final palette color being treated as transparency level.
+
+All enemies consist of 10 frames in total:
+Idle animation - first 6 frames (looped in a ping-pong manner)
+Attack animation - next 3 frames
+Pain animation - last 1 frame
+
+This is true even for creatures that don't have dedicated Idle/Attack/Pain animations (like Dwarf Towers) - the images are simply duplicated. For different variants of the same enemy (for example Centipede and Millipede) different palette colors are being used.
+
+Scene objects are duplicated in flipped and unflipped variants (used depending on player position in the world) - wasteful in terms of space but it seems this approach was easier for the developers. All sky and ground textures are represented by two images - flipped and unflipped, even if there's only one variant used in the game (like Astral Plane sky texture). Again, this is wasteful but apparently it was easier for developers to program when assuming fixed number of frames for specific items.
+
 ## Sounds
 Yendorian Tales uses Creative Voice File (.VOC) for digitized audio. Sound files are stored uncompressed in the game's `WORLD.DAT` file. Size information and file offsets are stored in the .EXE file - for Yendorian Tales 2, sound data starts at offset `0x2EBF1` and `0x2D057` for Yendorian Tales 3. In both cases, audio data is followed by file sizes, so all information is there for data extraction. These files are supported by most modern sound players - VLC being my tool of choice for verification.
 
