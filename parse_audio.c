@@ -12,18 +12,27 @@ exit
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * Yendorian Tales 2 & 3 audio extraction: digitized sounds (.VOC) and music (.CMF)
+ * both data formats are stored uncompressed in WORLD.DAT file, offsts and file sized are kept in game executables.
+ *
+ * Yendorian Tales 2: digitized audio data starting at offset 0x2EBF1 followed by file sizes, music data starting at offset 0x2EB73 followed by file sizes
+ * Yendorian Tales 3: digitized audio data starting at offset 0x2D057 followed by file sizes, music data starting at offset 0x2CFC7 followed by file sizes
+ */
+
 int yendor_version = 3;
 
 void fetchAudio(FILE *executable, FILE *worldDat, const char *extension, int32_t startOffset, uint32_t headerSignature)
 {
     int32_t fileOffset = 0x00FFFFFF;
     uint16_t fileSize = 0;
+    int filesWritten = 0;
     int fileCount = -1;
     char fileName[32];
 
     fseek(executable, startOffset, 0);
-    
-    // count sounds first
+
+    // count files first
     do
     {
         fread(&fileOffset, sizeof(int32_t), 1, executable);
@@ -37,6 +46,7 @@ void fetchAudio(FILE *executable, FILE *worldDat, const char *extension, int32_t
         fileCount++;
     } while ((fileOffset & 0xFF000000) == 0);
 
+    // extract data
     for (int i = 0; i < fileCount; ++i)
     {
         fseek(executable, startOffset + i * sizeof(int32_t), 0);
@@ -58,20 +68,24 @@ void fetchAudio(FILE *executable, FILE *worldDat, const char *extension, int32_t
             FILE *vocFile = fopen(fileName, "wb");
             fwrite(data, sizeof(uint8_t), fileSize, vocFile);
             fclose(vocFile);
+
+            filesWritten++;
         }
 
         free(data);
     }
+
+    printf("Successfuly written %d .%s files.\n", filesWritten, extension);
 }
+
 
 int main(int argc, char **argv)
 {
-    unsigned char buffer[318 * 198];
     char game_exe[32] = { "REGISTER.EXE" };
     char world_dat[32] = { "WORLD.DAT" };
-    
+
     for (int i = 1; i < argc; ++i)
-    {        
+    {
         if (!strcmp(argv[i], "-f") && i < argc - 1)
         {
             memset(world_dat, 0, sizeof(world_dat));
@@ -84,14 +98,14 @@ int main(int argc, char **argv)
             memset(game_exe, 0, sizeof(game_exe));
             strncpy(game_exe, "SWREG.EXE", sizeof(game_exe));
         }
-        
+
         if (!strcmp(argv[i], "-y3"))
         {
             yendor_version = 3;
             memset(game_exe, 0, sizeof(game_exe));
             strncpy(game_exe, "REGISTER.EXE", sizeof(game_exe));
         }
-        
+
         if (!strcmp(argv[i], "-?"))
         {
             printf("Usage: %s <optional parameters>\n", argv[0]);
@@ -101,7 +115,6 @@ int main(int argc, char **argv)
             return 0;
         }
     }
-
 
     FILE *executable = fopen(game_exe, "rb");
     if (!executable)
@@ -116,7 +129,7 @@ int main(int argc, char **argv)
         printf("Could not load %s!\n", world_dat);
         fclose(executable);
         return 1;
-    }   
+    }
 
     if (yendor_version == 2)
     {
@@ -133,6 +146,7 @@ int main(int argc, char **argv)
     }
 
     fclose(executable);
+    fclose(worldDat);
 
     return 0;
 }
