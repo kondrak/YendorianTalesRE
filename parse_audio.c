@@ -55,10 +55,10 @@ void fetchAudio(FILE *executable, FILE *worldDat, const char *extension, int32_t
         fread(&fileSize, sizeof(uint16_t), 1, executable);
         fseek(worldDat, fileOffset, 0);
 
-        uint8_t *data = (uint8_t *)malloc(fileSize * sizeof(uint8_t));    
+        uint8_t *data = (uint8_t *)malloc(fileSize * sizeof(uint8_t));
         fread(data, sizeof(uint8_t), fileSize, worldDat);
 
-        // verify header
+        // verify header: 0x43726561 ('C', 'r', 'e', 'a') for .VOC and 0x43544D46 ('C', 'T', 'M', 'F') for .CMF
         if ((data[3] | (data[2] << 8) | (data[1] << 16) | (data[0] << 24)) == headerSignature)
         {
             memset(fileName, 0, sizeof(fileName));
@@ -110,8 +110,8 @@ int main(int argc, char **argv)
         {
             printf("Usage: %s <optional parameters>\n", argv[0]);
             printf("-f X - specify name of the WORLD.DAT file (default: WORLD.DAT)\n");
-            printf("-y2  - extract Yendorian Tales 2 data (requires original SWREG.EXE file)\n");
-            printf("-y3  - extract Yendorian Tales 3 data (default, requires original REGISTER.EXE file)\n");
+            printf("-y2  - extract Yendorian Tales 2 audio (requires original SWREG.EXE file)\n");
+            printf("-y3  - extract Yendorian Tales 3 audio (default, requires original REGISTER.EXE file)\n");
             return 0;
         }
     }
