@@ -65,9 +65,9 @@ void fetchAudio(FILE *executable, FILE *worldDat, const char *extension, int32_t
             sprintf(fileName, "%s_y%d/%03d.%s", extension, yendor_version, i, extension);
             printf("Extracting: %s\n", fileName);
 
-            FILE *vocFile = fopen(fileName, "wb");
-            fwrite(data, sizeof(uint8_t), fileSize, vocFile);
-            fclose(vocFile);
+            FILE *audioFile = fopen(fileName, "wb");
+            fwrite(data, sizeof(uint8_t), fileSize, audioFile);
+            fclose(audioFile);
 
             filesWritten++;
         }
