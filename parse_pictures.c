@@ -15,7 +15,14 @@ exit
 
 #include <ctype.h>
 
-unsigned char PAL[256][3];
+/*
+ * Yendorian Tales 2 & 3 texture extraction: VGA bitmaps converted to PNGs (RGB or RGBA)
+ * Game images are stored uncompressed in PICTURES.VGA as a stream of bytes referencing respective color index in the palette.
+ * Palettes have been extracted using DosBox's screen capture feature.
+ *
+ */
+
+unsigned char PALETTE[256][3];
 int picOffset = 0;
 int picCount = 0;
 int scale = 1;
@@ -32,7 +39,7 @@ void loadPalette(const char *palName)
     }
 
     // palette file contains 256 triplets of RGB values
-    fread(PAL, sizeof(unsigned char), 256 * 3, palFile);
+    fread(PALETTE, sizeof(unsigned char), 256 * 3, palFile);
     fclose(palFile);
 }
 
@@ -45,11 +52,12 @@ void saveImage(int w, int h, int channels, unsigned char *buffer)
     for (int i = 0; i < w * h; ++i)
     {
 
-        rgbData[index++] = PAL[buffer[i]][0];
-        rgbData[index++] = PAL[buffer[i]][1];
-        rgbData[index++] = PAL[buffer[i]][2];
+        rgbData[index++] = PALETTE[buffer[i]][0];
+        rgbData[index++] = PALETTE[buffer[i]][1];
+        rgbData[index++] = PALETTE[buffer[i]][2];
+        // treat magenta as transparency color
         if (alpha)
-            rgbData[index++] = PAL[buffer[i]][0] == 0xFF && PAL[buffer[i]][1] == 0x00 && PAL[buffer[i]][2] == 0xFF ? 0x00 : 0xFF;
+            rgbData[index++] = PALETTE[buffer[i]][0] == 0xFF && PALETTE[buffer[i]][1] == 0x00 && PALETTE[buffer[i]][2] == 0xFF ? 0x00 : 0xFF;
     }
 
     memset(filename, 0, sizeof(filename));
@@ -170,9 +178,9 @@ int main(int argc, char **argv)
         fetchImages(picturesVga, buffer, 318, 198, 1);
         loadPalette("palettes/primary.pal");
         fetchImages(picturesVga, buffer, 318, 198, 3);
-        PAL[255][1] = 0xFF;
+        PALETTE[255][1] = 0xFF;
         fetchImages(picturesVga, buffer, 318, 198, 1);
-        PAL[255][1] = 0x00;
+        PALETTE[255][1] = 0x00;
         fetchImages(picturesVga, buffer, 318, 198, 2);
         // scene objects and walls
         fetchImages(picturesVga, buffer, 210, 105, 73);
@@ -191,9 +199,9 @@ int main(int argc, char **argv)
         // floors and ceilings
         fetchImages(picturesVga, buffer, 224, 74, 18);
         // lower floors and ceilings
-        PAL[255][1] = 0xFF;
+        PALETTE[255][1] = 0xFF;
         fetchImages(picturesVga, buffer, 224, 62, 2);
-        PAL[255][1] = 0x00;
+        PALETTE[255][1] = 0x00;
         fetchImages(picturesVga, buffer, 224, 62, 10);
         // paper dolls and paper doll effects
         fetchImages(picturesVga, buffer, 56, 136, 23);

@@ -1,13 +1,13 @@
 # Yendorian Tales - reverse engineering
-Yendorian Tales reverse engineering
-
 Done using HxD editor and DosBox with debugger feature enabled to track all assembly calls - reverse engineering old games is really easy these days!
 
 ## Graphics
-Both games store image date in a dedicated, uncompressed `PICTURES.VGA` file which is a concatenated stream of bytes - each one representing a single pixel referencing a color index in proper DOS palette. There's no size nor color information stored in this file, all data is fetched directly from the game's .EXE file. Graphics are grouped by size ranging from the largest (fullscreen images) to smallest (8x8 pixel icons used throughout the game). Pallete data was extracted using DosBox's screen capture feature and saved as `.pal` files. `PICTURES.VGA` is kept open during runtime and required images are fetched as memory offsets by the game when necessary. Most animation effects (enhanced weapons, texture shimmering) is done using good old palette cycling and different enemy variantions are also achieved by using different colors - extraction program only uses the primary palette for simplicity.
+Both games store image date in a dedicated, uncompressed `PICTURES.VGA` file which is a concatenated stream of bytes - each one representing a single pixel referencing a color index in proper DOS palette. There's no size nor color information stored in this file, all data is fetched directly from the game's .EXE file. Graphics are grouped by size ranging from the largest (fullscreen images) to smallest (8x8 pixel icons used throughout the game). Palette data was extracted using DosBox's screen capture feature and saved as `.pal` files. `PICTURES.VGA` is kept open during runtime and required images are fetched as memory offsets by the game when necessary. Most animation effects (enhanced weapons, texture shimmering) is done using good old palette cycling and different enemy variantions are also achieved by using different colors - extraction program only uses the primary palette for simplicity.
 Game runs in mode 13h at all times, one exception being the Pacific splash screen which is 640x480 and stored in the .EXE as a PCX file. For some reason both games fetch this data and save it on the disk, only to remove it after exiting the game.
 
-Final color in the pallete is used for transparency colorkeying - the extracted palette modifies that value to magenta for better distinction. Sample extraction program can also export palette colors to RGBA format with the final palette color being treated as transparency level.
+Last color in the palette is used for transparency colorkeying - the extracted palette modifies that value to magenta for better distinction. Sample extraction program can also export palette colors to RGBA format with the final palette color being treated as transparency level.
+
+<p align="center"><img src="bariag.png"></p>
 
 All enemies consist of 10 frames in total:
 Idle animation - first 6 frames (looped in a ping-pong manner)
