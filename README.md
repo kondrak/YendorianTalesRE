@@ -1,25 +1,24 @@
-# Yendorian Tales - reverse engineering
-Done using HxD editor and DosBox with debugger feature enabled to track all assembly calls - reverse engineering old games is really easy these days!
+# Yendorian Tales 2 & 3 - game data reverse engineering
+Yendorian Tales 2 (Book I: Chapter 2) and Yendorian Tales 3: The Tyrants of Thaine are fairly forgotten games of the late 1990s which by today's standard can be considered a clone of Might and Magic series. The goal of this project is to extract and descibe basic game data used by these games which could potentially lead to a modern remake or serve as a basis of a test project for a dungeon crawler game.
+All work was done using the HxD editor and DosBox's debugger to track assembly calls.
 
 ## Graphics
-Both games store image date in a dedicated, uncompressed `PICTURES.VGA` file which is a concatenated stream of bytes - each one representing a single pixel referencing a color index in proper DOS palette. There's no size nor color information stored in this file, all data is fetched directly from the game's .EXE file. Graphics are grouped by size ranging from the largest (fullscreen images) to smallest (8x8 pixel icons used throughout the game). Palette data was extracted using DosBox's screen capture feature and saved as `.pal` files. `PICTURES.VGA` is kept open during runtime and required images are fetched as memory offsets by the game when necessary. Most animation effects (enhanced weapons, texture shimmering) is done using good old palette cycling and different enemy variantions are also achieved by using different colors - extraction program only uses the primary palette for simplicity.
-Game runs in mode 13h at all times, one exception being the Pacific splash screen which is 640x480 and stored in the .EXE as a PCX file. For some reason both games fetch this data and save it on the disk, only to remove it after exiting the game.
+Both games store image data in a dedicated `PICTURES.VGA` file which is an uncompressed stream of bytes - each one representing a single pixel referencing an index in a specific 256-color DOS palette. There's no size nor offset information stored in this file, everything is kept in the game's executable. Graphics are grouped by size, ranging from the largest (fullscreen images) to smallest (8x8 pixel icons used throughout the game). `PICTURES.VGA` is kept open during runtime and required images are fetched when necessary. Games runs in mode 13h at all times, one exception being the Pacific splash screen which is 640x480 pixels and stored in the executable as a .PCX file. For some reason this image is extracted and saved on the disk during startup, only to be removed after exiting the game.
 
-Last color in the palette is used for transparency colorkeying - the extracted palette modifies that value to magenta for better distinction. Sample extraction program can also export palette colors to RGBA format with the final palette color being treated as transparency level.
+### Color palette
+Palette data was extracted using DosBox's screen capture and saved as binary `.pal` files. Final color is used for transparency information - the extracted palettes set that value to magenta for better distinction. Most animation effects (enhanced weapons, texture shimmering) is achieved with color cycling - a common technique used in games at the time.
+
+### Enemies
 
 <p align="center"><img src="bariag.png"></p>
 
-All enemies consist of 10 frames in total:
-Idle animation - first 6 frames (looped in a ping-pong manner)
-Attack animation - next 3 frames
-Pain animation - last 1 frame
+Enemies consist of 10 fixed-size frames: 6 frames for idle animations, 3 frames for attack, 1 frame for pain state - this is true even for creatures that don't have dedicated idle/attack/pain animations (like Dwarf Towers) - the images are simply duplicated. For multiple variants of the same enemy (Centipede/Millipede etc.) different palette colors are being used.
 
-This is true even for creatures that don't have dedicated Idle/Attack/Pain animations (like Dwarf Towers) - the images are simply duplicated. For different variants of the same enemy (for example Centipede and Millipede) different palette colors are being used.
+### Scene elements
+Most objects are duplicated in flipped and unflipped variants (used depending on player position in the world) - wasteful in terms of space but it seems this approach was easier for the developers. Some of them (for example portals) have a palette effect attached to them. All sky and ground textures are represented by two images - flipped and unflipped, even if there's only one variant used in the game (like Astral Plane sky texture).
 
-Scene objects are duplicated in flipped and unflipped variants (used depending on player position in the world) - wasteful in terms of space but it seems this approach was easier for the developers. All sky and ground textures are represented by two images - flipped and unflipped, even if there's only one variant used in the game (like Astral Plane sky texture). Again, this is wasteful but apparently it was easier for developers to program when assuming fixed number of frames for specific items.
-
-## Sounds
-Yendorian Tales uses Creative Voice File (.VOC) for digitized audio. Sound files are stored uncompressed in the game's `WORLD.DAT` file. Size information and file offsets are stored in the .EXE file - for Yendorian Tales 2, sound data starts at offset `0x2EBF1` and `0x2D057` for Yendorian Tales 3. In both cases, audio data is followed by file sizes, so all information is there for data extraction. These files are supported by most modern sound players - VLC being my tool of choice for verification.
+## Digitized sounds
+Both games use Creative Voice File (.VOC) for digitized audio. Sound files are stored uncompressed in the game's `WORLD.DAT` file. Size information and file offsets are kept in the executable - for Yendorian Tales 2 (`SWREG.EXE`), sound data starts at offset `0x2EBF1` and for Yendorian Tales 3 (`REGISTER.EXE`), data starts at offset `0x2D057`. In both cases, the data block is followed by file sizes - 2 bytes per file followed by a 0x00 byte. Most modern media players (like VLC) support .VOC playback without any problem.
 
 ## Music
-Yedndorian Tales uses Creative Music File (.CMF) which is similar to standard MIDI. Unlike the latter format, instrument banks are stored directly in the file, this way the music sounds exactly the same on every system. Just like digitized sounds, all CMF files are stored uncompressed in `WORLD.DAT` with size and offset information being stored in the game's .EXE file. For Yendorian Tales 2, music data starts at offset `0x2EB73` and `0x2CFC7` for Yendorian Tales 3. Music data is followed by file sizes, following the same rule as with .VOC files. Unlike the latter though, these files are hardly supported by modern audio players, so your best bet is to record it in DosBox to .WAV files and save it in a widely supported compressed format.
+Both games use Creative Music File (.CMF) for music. Unlike MIDI, this format stores instrument banks directly in the file - this way the playback sounds exactly the same with every audio driver. Just like digitized sounds, all .CMF files are stored uncompressed in `WORLD.DAT` with size and offset information being stored in the game's executable. For Yendorian Tales 2, music data starts at offset `0x2EB73` and for Yendorian Tales 3 it starts at `0x2CFC7`. The data block is followed by file sizes, following the same rule as with .VOC files (2 bytes per track followed by a 0x00 byte). Creative Music File is hardly supported by contemporary audio players, so the only ay to play it back is to either use a music player in DosBox (like MuchMusic) or convert it to a more modern format.
