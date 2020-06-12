@@ -46,7 +46,7 @@ Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset
         uint16_t <unknown>
         uint32_t gold;               // kill reward, decimal encoding - max 99,999,999
         uint32_t nuore;              // kill reward, decimal encoding - max 99,999,999
-        uint32_t food;               // kill reward, decimal encoding - max 99,999,999
+        uint32_t food/magic_ore;     // kill reward, decimal encoding - max 99,999,999
         uint32_t experience;         // kill reward, decimal encoding - max 99,999,999
         uint16_t <unknown>
         uint16_t <unknown>
