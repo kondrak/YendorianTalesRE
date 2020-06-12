@@ -29,15 +29,15 @@ Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset
         uint16_t damage;             // creature stats
         uint16_t attack_snd_index;   // .VOC file number
         uint16_t <unknown>
-        uint16_t projectile_snd_index; // .VOC file number
-        uint16_t <unknown>
+        uint16_t projectile_snd_index; // .VOC file number - no ranged attack if 0x00
+        uint16_t projectile_image;   // offset to projectile image
         uint16_t ranged_acc;         // creature stats
         uint16_t ranged_dam;         // creature stats
         uint16_t <unknown>
         uint16_t <unknown>
         uint16_t <unknown>
-        uint16_t special_attack1;    // 0x10 - Steal Food, 0x11 - Steal Nuore, 0x15 - Poison, 0x18 - Sick, 0x19 - Jinxing, 0x1D - Disease, 0x1E - Sick+Poison+Disease, 0x24 - Paralyze, 0x25 - Hexing, 0x27 - Stoning, 0x28 - Frozen, 0x29 - Cursing
-        uint16_t <unknown>
+        uint16_t special_attack1;    // 0x0F - Steal Gold, 0x10 - Steal Food, 0x11 - Steal Nuore, 0x15 - Poison, 0x18 - Sick, 0x19 - Jinxing, 0x1D - Disease, 0x1E - Sick+Poison+Disease, 0x24 - Paralyze, 0x25 - Hexing, 0x27 - Stoning, 0x28 - Frozen, 0x29 - Cursing
+        uint16_t projectile_attack_type; // kill/effect type for projectile hit
         uint16_t <unknown>
         uint16_t <unknown>
         uint16_t <unknown>
@@ -52,7 +52,7 @@ Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset
         uint16_t <unknown>
         uint8_t  animation_flags;    // upper 4 bits - idle animation type: 0 - none, 1 - ping-pong, 2 - restart; lower 4 bits: still unknown, looks like some sort of additional offset
         uint8_t  special_attack2;    // 0x10 - Party Attack, 0x12 - Break Shield, 0x14 - Break Weapon, 0x16 - Break Weapon+Shield, 0x18 - Break Projectile - needs more investigation
-        uint8_t  <unknown>
+        uint8_t  mobility;           // creature is mobile (0x00) or immobile - like Fungus or Dwarf Towers (0x02)
         uint8_t  translucency;       // determines if sprite is translucent (Ghost, Phase Titan) - 0x80 - on, 0x00 - off
         uint16_t immunity_bitmask;   // 0x01 - Power, 0x02 - Electricity, 0x04 - Cold, 0x08 - Fire, 0x10 - Magic Resistance, 0x0400 - Curse, 0x0800 - Hexing, 0x1000 - Freezing, 0x2000 - Paralysis, 0x4000 - Disease, 0x8000 - Poison
         uint8_t  <unknown>
