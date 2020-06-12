@@ -19,7 +19,6 @@ exit
  * Yendorian Tales 2 & 3 texture extraction: VGA bitmaps converted to PNGs (RGB or RGBA)
  * Game images are stored uncompressed in PICTURES.VGA as a stream of bytes referencing respective color index in the palette.
  * Palettes have been extracted using DosBox's screen capture feature.
- *
  */
 
 unsigned char PALETTE[256][3];

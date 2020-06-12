@@ -14,6 +14,53 @@ Palette data was extracted using DosBox's screen capture and saved as binary `.p
 
 Enemies consist of 10 fixed-size frames: 6 frames for idle animations, 3 frames for attack, 1 frame for pain state - this is true even for creatures that don't have dedicated idle/attack/pain animations (like Dwarf Towers) - the images are simply duplicated. For multiple variants of the same enemy (Centipede/Millipede etc.) different palette colors are being used.
 
+### Enemy data structure
+Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset `0x1A7994` in Yendorian Tales 2 and `0x4170DF` in Yendorian Tales 3. Enough data has been reverse engineered to get basic stats and properties but there's still some information that needs to be discovered:
+```c
+    struct Enemy {
+        char name[26];               // creature name
+        uint16_t start_frame_offset; // presumably offset to first idle frame in PICTURES.VGA
+        uint16_t <unknown>
+        uint16_t health;             // creature stats
+        uint16_t <unknown>
+        uint16_t accuracy;           // creature stats
+        uint16_t dexterity;          // creature stats
+        uint16_t absorption;         // creature stats
+        uint16_t damage;             // creature stats
+        uint16_t attack_snd_index;   // .VOC file number
+        uint16_t <unknown>
+        uint16_t projectile_snd_index; // .VOC file number
+        uint16_t <unknown>
+        uint16_t ranged_acc;         // creature stats
+        uint16_t ranged_dam;         // creature stats
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t special_attack1;    // 0x10 - Steal Food, 0x11 - Steal Nuore, 0x15 - Poison, 0x18 - Sick, 0x19 - Jinxing, 0x1D - Disease, 0x1E - Sick+Poison+Disease, 0x24 - Paralyze, 0x25 - Hexing, 0x27 - Stoning, 0x28 - Frozen, 0x29 - Cursing
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint32_t gold;               // kill reward, decimal encoding - max 99,999,999
+        uint32_t nuore;              // kill reward, decimal encoding - max 99,999,999
+        uint32_t food;               // kill reward, decimal encoding - max 99,999,999
+        uint32_t experience;         // kill reward, decimal encoding - max 99,999,999
+        uint16_t <unknown>
+        uint16_t <unknown>
+        uint8_t  animation_flags;    // upper 4 bits - idle animation type: 0 - none, 1 - ping-pong, 2 - restart; lower 4 bits: still unknown, looks like some sort of additional offset
+        uint8_t  special_attack2;    // 0x10 - Party Attack, 0x12 - Break Shield, 0x14 - Break Weapon, 0x16 - Break Weapon+Shield, 0x18 - Break Projectile - needs more investigation
+        uint8_t  <unknown>
+        uint8_t  translucency;       // determines if sprite is translucent (Ghost, Phase Titan) - 0x80 - on, 0x00 - off
+        uint16_t immunity_bitmask;   // 0x01 - Power, 0x02 - Electricity, 0x04 - Cold, 0x08 - Fire, 0x10 - Magic Resistance, 0x0400 - Curse, 0x0800 - Hexing, 0x1000 - Freezing, 0x2000 - Paralysis, 0x4000 - Disease, 0x8000 - Poison
+        uint8_t  <unknown>
+        uint8_t  resistance_bitmask; // 0x80 - Physical Damage, 0x20 - Magical Damage, 0xA0 - Both
+        uint16_t <unknown>
+    }
+```
+
 ### Scene elements
 Most objects are duplicated in flipped and unflipped variants (used depending on player position in the world) - wasteful in terms of space but it seems this approach was easier for the developers. Some (for example portals) have a palette effect attached to them. All sky and ground textures are represented by two images - flipped and unflipped, even if there's only one variant used in the game (like Astral Plane sky texture).
 
