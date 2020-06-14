@@ -44,22 +44,21 @@ typedef struct Enemy {
     uint16_t unknown7;
     uint16_t unknown8;
     uint16_t unknown9;
-    uint16_t unknown10;
-    uint16_t unknown11;
+    uint32_t unused0;            // always zero
     uint32_t gold;               // kill reward, decimal encoding - max 99,999,999
     uint32_t nuore;              // kill reward, decimal encoding - max 99,999,999
     uint32_t food_magic_ore;     // kill reward, decimal encoding - max 99,999,999
     uint32_t experience;         // kill reward, decimal encoding - max 99,999,999
-    uint16_t unknown12;
-    uint16_t unknown13;
+    uint16_t unused1;            // always zero
+    uint16_t unknown10;
     uint8_t  animation_flags;    // upper 4 bits - idle animation type: 0 - none, 1 - ping-pong, 2 - restart; lower 4 bits: still unknown, looks like some sort of additional offset
     uint8_t  special_attack2;    // 0x10 - Party Attack, 0x12 - Break Shield, 0x14 - Break Weapon, 0x16 - Break Weapon+Shield, 0x18 - Break Projectile - needs more investigation
     uint8_t  mobility;           // creature is mobile (0x00) or immobile - like Fungus or Dwarf Towers (0x02)
     uint8_t  translucency;       // determines if sprite is translucent (Ghost, Phase Titan) - 0x80 - on, 0x00 - off
     uint16_t immunity_bitmask;   // creature's immunities
-    uint8_t  unknown14;
+    uint8_t  unused2;            // always zero
     uint8_t  resistance_bitmask; // creature's resistances
-    uint16_t unknown15;
+    uint16_t unused3;            // always zero
 } Enemy;
 
 enum Immunities {
@@ -73,7 +72,7 @@ enum Immunities {
     FREEZING  = 1 << 12,
     PARALYSIS = 1 << 13,
     DISEASE   = 1 << 14,
-    POISON   = 1 << 15
+    POISON    = 1 << 15
 };
 
 enum Resistances {
@@ -120,7 +119,10 @@ void printEnemy(Enemy *e)
     printf("          Power: %s\n", e->immunity_bitmask & POWER ? "Immune" : "");
     printf("   Magic Damage: %s\n", e->immunity_bitmask & MAGIC_RESISTANCE || e->resistance_bitmask & MAGIC ? "Resistant" : "");
     printf("Physical Damage: %s\n", e->resistance_bitmask & PHYSICAL ? "Resistant" : "");
-    printf(" Special Attack:\n");
+    printf(" Special Attack: %X %X\n", e->special_attack1, e->special_attack2);
+    printf("Unknown: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n", e->unknown0, e->unknown1, e->unknown2, e->unknown3, e->unknown4, e->unknown5,
+                                                                         e->unknown6, e->unknown7, e->unknown8, e->unknown9, e->unknown10);
+    //printf("Pattern: %04X\n", e->unknown13);
     printf("\n");
 }
 
