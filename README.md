@@ -18,7 +18,8 @@ Enemies consist of 10 fixed-size frames: 6 frames for idle animations, 3 frames 
 Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset `0x1A7994` in Yendorian Tales 2 and `0x4170DF` in Yendorian Tales 3. Enough data has been reverse engineered to get basic stats and properties but there's still some information that needs to be discovered:
 ```c
     struct Enemy {
-        char name[26];               // creature name
+        char name1[13];              // creature name: first part
+        char name2[13];              // creature name: second part (optional)
         uint16_t start_frame_offset; // presumably offset to first idle frame in PICTURES.VGA
         uint16_t <unknown>
         uint16_t health;             // creature stats

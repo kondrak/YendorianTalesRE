@@ -19,7 +19,8 @@ exit
 int yendor_version = 3;
 
 typedef struct Enemy {
-    char name[26];               // creature name
+    char name1[13];              // creature name: first part
+    char name2[13];              // creature name: second part (optional)
     uint16_t start_frame_offset; // presumably offset to first idle frame in PICTURES.VGA
     uint16_t unknown0;
     uint16_t health;             // creature stats
@@ -73,8 +74,8 @@ uint32_t decodeHex(uint32_t v)
 
 void printEnemy(Enemy *e)
 {
-    printf("Name: %s\n", e->name);
-    printf("-------------------\n");
+    printf("Name: %s%s\n", e->name1, e->name2);
+    printf("-----------------------\n");
     printf("     Experience: %u\n", decodeHex(e->experience));
     printf("           Gold: %d\n", decodeHex(e->gold));
     printf(" Food/Magic Ore: %d\n", decodeHex(e->food_magic_ore));
@@ -106,7 +107,7 @@ void printEnemy(Enemy *e)
 void fetchEnemies(FILE *worldDat, int32_t startOffset)
 {
     Enemy nextEnemy;
-    int enemyCount = yendor_version == 3 ? 71 : 61;
+    int enemyCount = yendor_version == 3 ? 72 : 61;
 
     // extract data (106 bytes oer entry)
     for (int i = 0; i < enemyCount; ++i)
