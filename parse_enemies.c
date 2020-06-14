@@ -90,8 +90,45 @@ uint32_t decodeHex(uint32_t v)
     return b0 + b1 + b2 + b3;
 }
 
+const char *attack1Name(uint16_t attack1)
+{
+    switch(attack1)
+    {
+        case 0x0F: return "Steal Gold";
+        case 0x10: if (yendor_version == 2) return "Party Attack"; else return "Steal Food";  // "Steal Food" is never used
+        case 0x11: return "Steal Nuore"; // never used
+        case 0x18: return "Sick";
+        case 0x19: return "Jinxing";
+        case 0x1D: return "Disease";
+        case 0x1E: return "Sick, Poison, Disease";
+        case 0x24: return "Paralyze";
+        case 0x25: return "Hexing";
+        case 0x28: return "Frozen";
+        case 0x29: return "Cursing";
+        case 0x2C: return "Poison";
+        default:   return "";
+    }
+}
+
+const char *attack2Name(uint16_t attack2)
+{
+    switch(attack2)
+    {
+        case 0x02: return "Break Shield";         // never used
+        case 0x04: return "Break Weapon";         // never used
+        case 0x06: return "Break Weapon, Shield"; // never used
+        case 0x08: return "Break Projectile";     // never used
+        case 0xB0:
+        case 0xD0: return "Party Attack";
+        default:   return "";
+    }
+}
+
 void printEnemy(Enemy *e)
 {
+    const char *attack1 = attack1Name(e->special_attack1);
+    const char *attack2 = attack2Name(e->special_attack2);
+
     printf("%s%s\n", e->name1, e->name2);
     printf("-----------------------\n");
     printf("     Experience: %u\n", decodeHex(e->experience));
@@ -119,10 +156,10 @@ void printEnemy(Enemy *e)
     printf("          Power: %s\n", e->immunity_bitmask & POWER ? "Immune" : "");
     printf("   Magic Damage: %s\n", e->immunity_bitmask & MAGIC_RESISTANCE || e->resistance_bitmask & MAGIC ? "Resistant" : "");
     printf("Physical Damage: %s\n", e->resistance_bitmask & PHYSICAL ? "Resistant" : "");
-    printf(" Special Attack: %X %X\n", e->special_attack1, e->special_attack2);
+    printf(" Special Attack: %s%s%s\n", attack2, strlen(attack2) > 0 && strlen(attack1) > 0 ? ", " : "", attack1);
     printf("Unknown: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n", e->unknown0, e->unknown1, e->unknown2, e->unknown3, e->unknown4, e->unknown5,
                                                                          e->unknown6, e->unknown7, e->unknown8, e->unknown9, e->unknown10);
-    //printf("Pattern: %04X\n", e->unknown13);
+   // printf("Pattern: %s %X\n", e->unknown9 != 0 ? "yes " : "no ", e->unknown9);
     printf("\n");
 }
 
