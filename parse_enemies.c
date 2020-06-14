@@ -56,11 +56,30 @@ typedef struct Enemy {
     uint8_t  special_attack2;    // 0x10 - Party Attack, 0x12 - Break Shield, 0x14 - Break Weapon, 0x16 - Break Weapon+Shield, 0x18 - Break Projectile - needs more investigation
     uint8_t  mobility;           // creature is mobile (0x00) or immobile - like Fungus or Dwarf Towers (0x02)
     uint8_t  translucency;       // determines if sprite is translucent (Ghost, Phase Titan) - 0x80 - on, 0x00 - off
-    uint16_t immunity_bitmask;   // 0x01 - Power, 0x02 - Electricity, 0x04 - Cold, 0x08 - Fire, 0x10 - Magic Resistance, 0x0400 - Curse, 0x0800 - Hexing, 0x1000 - Freezing, 0x2000 - Paralysis, 0x4000 - Disease, 0x8000 - Poison
+    uint16_t immunity_bitmask;   // creature's immunities
     uint8_t  unknown14;
-    uint8_t  resistance_bitmask; // 0x80 - Physical Damage, 0x20 - Magical Damage, 0xA0 - Both
+    uint8_t  resistance_bitmask; // creature's resistances
     uint16_t unknown15;
 } Enemy;
+
+enum Immunities {
+    POWER    = 1 << 0,
+    ELECTRIC = 1 << 1,
+    COLD     = 1 << 2,
+    FIRE     = 1 << 3,
+    MAGIC_RESISTANCE = 1 << 4,
+    CURSING   = 1 << 10,
+    HEXING    = 1 << 11,
+    FREEZING  = 1 << 12,
+    PARALYSIS = 1 << 13,
+    DISEASE   = 1 << 14,
+    POISON   = 1 << 15
+};
+
+enum Resistances {
+    MAGIC    = 0x20,
+    PHYSICAL = 0x80
+};
 
 uint32_t decodeHex(uint32_t v)
 {
@@ -74,7 +93,7 @@ uint32_t decodeHex(uint32_t v)
 
 void printEnemy(Enemy *e)
 {
-    printf("Name: %s%s\n", e->name1, e->name2);
+    printf("%s%s\n", e->name1, e->name2);
     printf("-----------------------\n");
     printf("     Experience: %u\n", decodeHex(e->experience));
     printf("           Gold: %d\n", decodeHex(e->gold));
@@ -89,19 +108,20 @@ void printEnemy(Enemy *e)
     printf("    Ranged acc.: %d\n", e->ranged_acc);
     printf("    Ranged dam.: %d\n", e->ranged_dam);
     printf("\n");
-    printf("         Poison:\n");
-    printf("        Disease:\n");
-    printf("      Paralysis:\n");
-    printf("       Freezing:\n");
-    printf("         Hexing:\n");
-    printf("        Cursing:\n");
-    printf("           Fire:\n");
-    printf("           Cold:\n");
-    printf("       Electric:\n");
-    printf("          Power:\n");
-    printf("   Magic Damage:\n");
-    printf("Physical Damage:\n");
+    printf("         Poison: %s\n", e->immunity_bitmask & POISON ? "Immune" : "");
+    printf("        Disease: %s\n", e->immunity_bitmask & DISEASE ? "Immune" : "");
+    printf("      Paralysis: %s\n", e->immunity_bitmask & PARALYSIS ? "Immune" : "");
+    printf("       Freezing: %s\n", e->immunity_bitmask & FREEZING ? "Immune" : "");
+    printf("         Hexing: %s\n", e->immunity_bitmask & HEXING ? "Immune" : "");
+    printf("        Cursing: %s\n", e->immunity_bitmask & CURSING ? "Immune" : "");
+    printf("           Fire: %s\n", e->immunity_bitmask & FIRE ? "Immune" : "");
+    printf("           Cold: %s\n", e->immunity_bitmask & COLD ? "Immune" : "");
+    printf("       Electric: %s\n", e->immunity_bitmask & ELECTRIC ? "Immune" : "");
+    printf("          Power: %s\n", e->immunity_bitmask & POWER ? "Immune" : "");
+    printf("   Magic Damage: %s\n", e->immunity_bitmask & MAGIC_RESISTANCE || e->resistance_bitmask & MAGIC ? "Resistant" : "");
+    printf("Physical Damage: %s\n", e->resistance_bitmask & PHYSICAL ? "Resistant" : "");
     printf(" Special Attack:\n");
+    printf("\n");
 }
 
 void fetchEnemies(FILE *worldDat, int32_t startOffset)
