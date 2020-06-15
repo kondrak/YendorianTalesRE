@@ -22,43 +22,43 @@ typedef struct Enemy {
     char name1[13];              // creature name: first part
     char name2[13];              // creature name: second part (optional)
     uint16_t start_frame_offset; // presumably offset to first idle frame in PICTURES.VGA
-    uint16_t unknown0;
+    uint16_t unknown_0;
     uint16_t health;             // creature stats
-    uint16_t unknown1;
+    uint16_t unknown_1;
     uint16_t accuracy;           // creature stats
     uint16_t dexterity;          // creature stats
     uint16_t absorption;         // creature stats
     uint16_t damage;             // creature stats
     uint16_t attack_snd_index;   // .VOC file number
-    uint16_t unknown2;
+    uint16_t unknown_2;
     uint16_t projectile_snd_index; // .VOC file number - no ranged attack if 0x00
     uint16_t projectile_image;   // offset to projectile image
     uint16_t ranged_acc;         // creature stats
     uint16_t ranged_dam;         // creature stats
-    uint16_t unknown3;
-    uint16_t unknown4;
-    uint16_t unknown5;
-    uint16_t special_attack1;    // 0x0F - Steal Gold, 0x10 - Steal Food, 0x11 - Steal Nuore, 0x15 - Poison, 0x18 - Sick, 0x19 - Jinxing, 0x1D - Disease, 0x1E - Sick+Poison+Disease, 0x24 - Paralyze, 0x25 - Hexing, 0x27 - Stoning, 0x28 - Frozen, 0x29 - Cursing
+    uint16_t unknown_3;
+    uint16_t unknown_4;
+    uint16_t unknown_5;
+    uint16_t special_attack1;    // first special attack flag
     uint16_t projectile_attack_type; // kill/effect type for projectile hit
-    uint16_t unknown6;
-    uint16_t unknown7;
-    uint16_t unknown8;
-    uint16_t unknown9;
-    uint32_t unused0;            // always zero
+    uint16_t unknown_6;
+    uint16_t unknown_7;
+    uint16_t unknown_8;
+    uint16_t unknown_9;
+    uint32_t UNUSED_0;           // always zero
     uint32_t gold;               // kill reward, decimal encoding - max 99,999,999
     uint32_t nuore;              // kill reward, decimal encoding - max 99,999,999
     uint32_t food_magic_ore;     // kill reward, decimal encoding - max 99,999,999
     uint32_t experience;         // kill reward, decimal encoding - max 99,999,999
-    uint16_t unused1;            // always zero
-    uint16_t unknown10;
+    uint16_t UNUSED_1;           // always zero
+    uint16_t unknown_10;
     uint8_t  animation_flags;    // upper 4 bits - idle animation type: 0 - none, 1 - ping-pong, 2 - restart; lower 4 bits: still unknown, looks like some sort of additional offset
-    uint8_t  special_attack2;    // 0x10 - Party Attack, 0x12 - Break Shield, 0x14 - Break Weapon, 0x16 - Break Weapon+Shield, 0x18 - Break Projectile - needs more investigation
-    uint8_t  mobility;           // creature is mobile (0x00) or immobile - like Fungus or Dwarf Towers (0x02)
+    uint8_t  special_attack2;    // second special attack flag
+    uint8_t  mobility;           // creature is immobile - like Fungus or Dwarf Towers (0x02) or mobile (other)
     uint8_t  translucency;       // determines if sprite is translucent (Ghost, Phase Titan) - 0x80 - on, 0x00 - off
     uint16_t immunity_bitmask;   // creature's immunities
-    uint8_t  unused2;            // always zero
+    uint8_t  UNUSED_2;           // always zero
     uint8_t  resistance_bitmask; // creature's resistances
-    uint16_t unused3;            // always zero
+    uint16_t UNUSED_3;           // always zero
 } Enemy;
 
 enum Immunities {
@@ -79,6 +79,8 @@ enum Resistances {
     MAGIC    = 0x20,
     PHYSICAL = 0x80
 };
+
+const char *animation_types[] = { "none", "ping-pong", "restart" };
 
 uint32_t decodeHex(uint32_t v)
 {
@@ -156,10 +158,12 @@ void printEnemy(Enemy *e)
     printf("          Power: %s\n", e->immunity_bitmask & POWER ? "Immune" : "");
     printf("   Magic Damage: %s\n", e->immunity_bitmask & MAGIC_RESISTANCE || e->resistance_bitmask & MAGIC ? "Resistant" : "");
     printf("Physical Damage: %s\n", e->resistance_bitmask & PHYSICAL ? "Resistant" : "");
-    printf(" Special Attack: %s%s%s\n", attack2, strlen(attack2) > 0 && strlen(attack1) > 0 ? ", " : "", attack1);
-    printf("Unknown: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n", e->unknown0, e->unknown1, e->unknown2, e->unknown3, e->unknown4, e->unknown5,
-                                                                         e->unknown6, e->unknown7, e->unknown8, e->unknown9, e->unknown10);
-   // printf("Pattern: %s %X\n", e->unknown9 != 0 ? "yes " : "no ", e->unknown9);
+    printf(" Special Attack: %s%s%s\n\n", attack2, strlen(attack2) > 0 && strlen(attack1) > 0 ? ", " : "", attack1);
+    printf("  Animation: %s\n", animation_types[e->animation_flags >> 4]);
+    printf("Translucent: %s\n", e->translucency == 0x80 ? "yes" : "no");
+    printf("     Mobile: %s\n", e->mobility != 0x02 ? "yes" : "no");
+    printf("    Unknown: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n", e->unknown_0, e->unknown_1, e->unknown_2, e->unknown_3, e->unknown_4,
+                                                                                    e->unknown_5, e->unknown_6, e->unknown_7, e->unknown_8, e->unknown_9, e->unknown_10);
     printf("\n");
 }
 
