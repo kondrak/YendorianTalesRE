@@ -31,14 +31,14 @@ typedef struct Enemy {
     uint16_t damage;             // creature stats
     uint16_t attack_snd_index;   // .VOC file number
     uint16_t unknown_2;
+    uint16_t projectile_image;     // offset to projectile image
     uint16_t projectile_snd_index; // .VOC file number - no ranged attack if 0x00
-    uint16_t projectile_image;   // offset to projectile image
-    uint16_t ranged_acc;         // creature stats
-    uint16_t ranged_dam;         // creature stats
+    uint16_t ranged_acc;           // creature stats
+    uint16_t ranged_dam;           // creature stats
     uint16_t unknown_3;
     uint16_t unknown_4;
     uint16_t unknown_5;
-    uint16_t special_attack1;    // first special attack flag
+    uint16_t special_attack1;        // first special attack flag
     uint16_t projectile_attack_type; // kill/effect type for projectile hit
     uint16_t unknown_6;
     uint16_t unknown_7;
