@@ -159,7 +159,13 @@ void printEnemy(Enemy *e)
     printf("   Magic Damage: %s\n", e->immunity_bitmask & MAGIC_RESISTANCE || e->resistance_bitmask & MAGIC ? "Resistant" : "");
     printf("Physical Damage: %s\n", e->resistance_bitmask & PHYSICAL ? "Resistant" : "");
     printf(" Special Attack: %s%s%s\n\n", attack2, strlen(attack2) > 0 && strlen(attack1) > 0 ? ", " : "", attack1);
-    printf("  Animation: %s\n", animation_types[e->animation_flags >> 4]);
+    printf("     Animation: %s\n", animation_types[e->animation_flags >> 4]);
+    printf("    Attack snd: %03d.voc\n", e->attack_snd_index);
+    printf("Projectile snd: ");
+    if (e->projectile_snd_index > 0)
+        printf("%03d.voc\n", e->projectile_snd_index);
+    else
+        printf("-\n");
     printf("Translucent: %s\n", e->translucency == 0x80 ? "yes" : "no");
     printf("     Mobile: %s\n", e->mobility != 0x02 ? "yes" : "no");
     printf("    Unknown: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n", e->unknown_0, e->unknown_1, e->unknown_2, e->unknown_3, e->unknown_4,

@@ -62,7 +62,7 @@ void fetchAudio(FILE *executable, FILE *worldDat, const char *extension, int32_t
         if ((data[3] | (data[2] << 8) | (data[1] << 16) | (data[0] << 24)) == headerSignature)
         {
             memset(fileName, 0, sizeof(fileName));
-            sprintf(fileName, "%s_y%d/%03d.%s", extension, yendor_version, i, extension);
+            sprintf(fileName, "%s_y%d/%03d.%s", extension, yendor_version, i+1, extension);
             printf("Extracting: %s\n", fileName);
 
             FILE *audioFile = fopen(fileName, "wb");
