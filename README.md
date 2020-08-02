@@ -64,6 +64,9 @@ Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset
 ### Scene elements
 Most objects are duplicated in flipped and unflipped variants (used depending on player position in the world) - wasteful in terms of space but it seems this approach was easier for the developers. Some (for example portals) have a palette effect attached to them. All sky and ground textures are represented by two images - flipped and unflipped, even if there's only one variant used in the game (like Astral Plane sky texture).
 
+### Spells
+Spells take 80 bytes per entry in the `WORLD.DAT` file - starting at offset `0x1AA65E` in Yendorian Tales 2 and `0x41B5BF` in Yendorian Tales 3. 
+
 ## Audio
 Both games use [Creative Voice File (.VOC)](http://www.shikadi.net/moddingwiki/VOC_Format) for digitized audio and [Creative Music File (.CMF)](http://www.shikadi.net/moddingwiki/CMF_Format) for music.
 
@@ -77,3 +80,4 @@ Unlike MIDI, this format stores instrument banks directly in the file - this way
 - parse_audio.c - extracts sound and music data
 - parse_enemies.c - extracts and prints enemy information
 - parse_pictures.c - extracts graphics and exports them to .PNG files (with or without alpha channel)
+- parse_spells.c - early WIP spell data extraction
