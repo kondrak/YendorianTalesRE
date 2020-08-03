@@ -64,20 +64,24 @@ Enemies take 106 bytes per creature in the `WORLD.DAT` file - starting at offset
 ### Scene elements
 Most objects are duplicated in flipped and unflipped variants (used depending on player position in the world) - wasteful in terms of space but it seems this approach was easier for the developers. Some (for example portals) have a palette effect attached to them. All sky and ground textures are represented by two images - flipped and unflipped, even if there's only one variant used in the game (like Astral Plane sky texture).
 
-### Spells
+## Spells
 Spells take 80 bytes per entry in the `WORLD.DAT` file - starting at offset `0x1AA65E` in Yendorian Tales 2 and `0x41B5BF` in Yendorian Tales 3. 
 
 ## Audio
 Both games use [Creative Voice File (.VOC)](http://www.shikadi.net/moddingwiki/VOC_Format) for digitized audio and [Creative Music File (.CMF)](http://www.shikadi.net/moddingwiki/CMF_Format) for music.
 
 ### Digitized sounds
-Sound files are stored uncompressed in the game's `WORLD.DAT` file. Size information and file offsets are kept in the executable - for Yendorian Tales 2 (`SWREG.EXE`), sound data starts at offset `0x2EBF1` and for Yendorian Tales 3 (`REGISTER.EXE`), data starts at offset `0x2D057`. In both cases, the data block is followed by file sizes - 2 bytes per file followed by a 0x00 byte. Most modern media players (like [VLC](https://www.videolan.org)) support .VOC playback without any problem.
+Sound files are stored uncompressed in `WORLD.DAT`. File offsets (4 bytes), followed by size information (2 bytes) are stored in the game's executable. For Yendorian Tales 2 (`SWREG.EXE`) it starts at offset `0x2EBF1` and for Yendorian Tales 3 (`REGISTER.EXE`) at offset `0x2D057`. Each entry is followed by a `0x00` byte. Most modern media players (like [VLC](https://www.videolan.org)) support .VOC playback without any problem.
 
 ### Music
-Unlike MIDI, this format stores instrument banks directly in the file - this way the playback sounds exactly the same with every audio driver. Just like digitized sounds, all .CMF files are stored uncompressed in `WORLD.DAT` with size and offset information being stored in the game's executable. For Yendorian Tales 2, music data starts at offset `0x2EB73` and for Yendorian Tales 3 it starts at `0x2CFC7`. The data block is followed by file sizes, following the same rule as with .VOC files (2 bytes per track followed by a 0x00 byte). Creative Music File is hardly supported by contemporary audio players, so the only way to play it back is to either use a music player in DosBox (like [MuchMusic](http://www.vgmpf.com/Wiki/index.php?title=MuchMusic)) or convert it to a more modern format.
+Unlike MIDI, this format stores instrument banks directly in the file - this way the playback sounds exactly the same with every audio driver. All .CMF files are stored uncompressed in `WORLD.DAT`. File offsets (4 bytes), followed by size information (2 bytes) are stored in the game's executable. For Yendorian Tales 2 (`SWREG.EXE`) it starts at offset `0x2EB73` and for Yendorian Tales 3 (`REGISTER.EXE`) at offset `0x2CFC7`. Each entry is followed by a `0x00` byte, same as in the case of .VOC files. Creative Music File is hardly supported by contemporary audio players, so the only way to play it back is to either use a music player in DosBox (like [MuchMusic](http://www.vgmpf.com/Wiki/index.php?title=MuchMusic)) or convert it to a more modern format.
 
 ### Sample programs
-- parse_audio.c - extracts sound and music data
-- parse_enemies.c - extracts and prints enemy information
-- parse_pictures.c - extracts graphics and exports them to .PNG files (with or without alpha channel)
-- parse_spells.c - early WIP spell data extraction
+- `parse_audio.c` - extracts sound and music data
+- `parse_enemies.c` - extracts and prints enemy information
+- `parse_pictures.c` - extracts graphics and exports them to .PNG files (with or without alpha channel)
+- `parse_spells.c` - early WIP spell data extraction
+
+### TODO
+- identify spell structure fields
+- identify map structure

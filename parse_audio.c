@@ -14,10 +14,10 @@ exit
 
 /*
  * Yendorian Tales 2 & 3 audio extraction: digitized sounds (.VOC) and music (.CMF)
- * both data formats are stored uncompressed in WORLD.DAT file, offsts and file sized are kept in game executables.
+ * both data formats are stored uncompressed in WORLD.DAT file, offsts and file sizes are kept in game executables.
  *
- * Yendorian Tales 2: digitized audio data starting at offset 0x2EBF1 followed by file sizes, music data starting at offset 0x2EB73 followed by file sizes
- * Yendorian Tales 3: digitized audio data starting at offset 0x2D057 followed by file sizes, music data starting at offset 0x2CFC7 followed by file sizes
+ * Yendorian Tales 2: SWREG.EXE - digitized audio data offsets start at 0x2EBF1 followed by file sizes, music data offsets start at 0x2EB73 followed by file sizes
+ * Yendorian Tales 3: REGISTER.EXE - digitized audio data offsets start at 0x2D057 followed by file sizes, music data offsets start at 0x2CFC7 followed by file sizes
  */
 
 int yendor_version = 3;
